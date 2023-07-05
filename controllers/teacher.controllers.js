@@ -10,7 +10,7 @@ routes.login = async (req, res) => {
 
   try {
     const user = await teacher.findOne({ email });
-    if (!user) return res.status(404).json({ error: "User not found" });
+    if (!user) return res.status(400).json({ error: "User not found" });
 
     const isMatch = await bcrpyt.compare(password, user.password);
     if (!isMatch) return res.status(400).json({ error: "Invalid credentials" });
@@ -66,7 +66,7 @@ routes.addquestion = async (req, res) => {
   }
   try {
     const result = await questions.create(dta);
-    res.status(201).json({ result });
+    res.status(201).json({success: "Question Added Successfully" });
   } catch (error) {
     res.status(500).json({ error: "Something went wrong" });
   }

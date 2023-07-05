@@ -4,6 +4,7 @@ import admin from "../models/admin.model.js";
 import teacher from "../models/teacher.model.js";
 import student from "../models/student.model.js";
 import questions from "../models/questions.model.js";
+import test from "../models/test.model.js";
 
 const routes = {};
 
@@ -90,6 +91,18 @@ routes.getteachers = async (req, res) => {
   }
 };
 
+routes.deleteteacher = async (req, res) => {
+  const id = req.params.id;
+
+  try {
+    const deleteques = await questions.deleteMany({ addBy: id });
+    const teach = await teacher.findByIdAndDelete(id);
+    res.status(200).json({ success: "Teacher deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ error: "Something went wrong" });
+  }
+};
+
 routes.getquestions = async (req, res) => {
   try {
     const allquestions = await questions.find().populate("addBy", "name");
@@ -119,26 +132,47 @@ routes.getusers = async (req, res) => {
   }
 };
 
-routes.getuser = async (req, res) => {
+routes.deleteuser = async (req, res) => {
   const id = req.params.id;
 
   try {
-    const user = await user.findById(id).select("-password").populate("test");
-    res.status(200).json({ user });
+    const tes = await test.findOneAndDelete({ student: id });
+    const user = await student.findByIdAndDelete(id);
+    res.status(200).json({ success: "User deleted successfully" });
   } catch (error) {
     res.status(500).json({ error: "Something went wrong" });
   }
 };
 
+routes.deleteunpaid = async (req, res) => {
+  try {
+    const user = await student.deleteMany({ isPaid: false });
+    res.status(200).json({ success: "Unpaid users deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ error: "Something went wrong" });
+  }
+};
+
+// routes.getuser = async (req, res) => {
+//   const id = req.params.id;
+
+//   try {
+//     const user = await user.findById(id).select("-password").populate("test");
+//     res.status(200).json({ user });
+//   } catch (error) {
+//     res.status(500).json({ error: "Something went wrong" });
+//   }
+// };
+
 routes.getscores = async (req, res) => {
   try {
-    const user = await user
+    const users = await student
       .find({ isExamGiven: true })
       .select("-password")
-      .populate("test")
-      .sort({ score: -1 });
+      .populate("test", "score currentQuestion currentTimer")
+      // .sort({ score: -1 });
 
-    res.status(200).json({ user });
+    res.status(200).json({ users });
   } catch (error) {
     res.status(500).json({ error: "Something went wrong" });
   }

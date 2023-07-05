@@ -283,7 +283,7 @@ routes.getTimer = async (req, res) => {
 routes.getEndExam = async (req, res) => {
   const id = req.userId;
 
-  // try {
+  try {
   const user = await student.findById(id).select("test isExamGiven");
   const testdata = await test.findById(user.test).select("answers");
 
@@ -301,9 +301,9 @@ routes.getEndExam = async (req, res) => {
   }
 
   res.status(200).json({ dta });
-  // } catch (error) {
-  //   res.status(500).json({ error: "Something went wrong" });
-  // }
+  } catch (error) {
+    res.status(500).json({ error: "Something went wrong" });
+  }
 };
 
 export default routes;
