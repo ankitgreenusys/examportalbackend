@@ -38,6 +38,7 @@ routes.signup = async (req, res) => {
     addharNumber,
     yearOfPassing,
     itiTrade,
+    category,
   } = req.body;
 
   // 6 digit otp
@@ -57,6 +58,7 @@ routes.signup = async (req, res) => {
     itiTrade,
     otp,
     otpExpiresIn: exp,
+    category,
   };
 
   // try {
@@ -65,7 +67,7 @@ routes.signup = async (req, res) => {
     return res.status(400).json({ error: "User already exists" });
 
   if (user) {
-    student.deleteOne({ email });
+    await student.deleteOne({ email });
   }
 
   //check addhar number and phonenumber is unique
@@ -251,7 +253,7 @@ routes.changeTimer = async (req, res) => {
       .findById(user.test)
       .select("currentTimer isCompleted");
 
-      // console.log(req.body.currentTimer)
+    // console.log(req.body.currentTimer)
 
     testdata.currentTimer = req.body.currentTimer;
 
@@ -284,23 +286,23 @@ routes.getEndExam = async (req, res) => {
   const id = req.userId;
 
   try {
-  const user = await student.findById(id).select("test isExamGiven");
-  const testdata = await test.findById(user.test).select("answers");
+    const user = await student.findById(id).select("test isExamGiven");
+    const testdata = await test.findById(user.test).select("answers");
 
-  if (!user.isExamGiven)
-    return res.status(400).json({ error: "Exam not given" });
+    if (!user.isExamGiven)
+      return res.status(400).json({ error: "Exam not given" });
 
-  const dta = {
-    answered: 0,
-    unanswered: 0,
-  };
+    const dta = {
+      answered: 0,
+      unanswered: 0,
+    };
 
-  for (let i = 0; i < 20; i++) {
-    if (testdata.answers[i] != "skip") dta.answered += 1;
-    else dta.unanswered += 1;
-  }
+    for (let i = 0; i < 20; i++) {
+      if (testdata.answers[i] != "skip") dta.answered += 1;
+      else dta.unanswered += 1;
+    }
 
-  res.status(200).json({ dta });
+    res.status(200).json({ dta });
   } catch (error) {
     res.status(500).json({ error: "Something went wrong" });
   }

@@ -45,6 +45,11 @@ const studentSchema = new mongoose.Schema({
       "Electrican",
     ],
   },
+  category: {
+    type: String,
+    enum: ["General", "OBC", "SC", "ST"],
+    default: "General",
+  },
   otp: {
     type: Number,
     default: 0,
